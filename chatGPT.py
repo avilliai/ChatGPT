@@ -15,7 +15,7 @@ def GPT(stra):
     response = openai.Completion.create(
         engine="text-davinci-002",
         prompt=prompt,
-        max_tokens=1024,
+        max_tokens=450,
         n=1,
         temperature=0.5,
     )
