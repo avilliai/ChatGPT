@@ -23,6 +23,7 @@ def GPT(stra,mode=1):
     # Print the generated text
 
     str0 = str(response["choices"][0]["text"])
+    str0 = str0.replace('\n\n', '\n')
     if mode==0:
         return str0
     else:
