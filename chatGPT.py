@@ -8,14 +8,14 @@ from PIL import Image
 from PIL import ImageDraw
 # Set the API key for the openai module
 openai.api_key = "你的key"
-def GPT(stra):
+def GPT(stra,mode=1):
     # Use the GPT-3 model to generate text
     print('已接受问题'+stra)
     prompt = stra
     response = openai.Completion.create(
         engine="text-davinci-002",
         prompt=prompt,
-        max_tokens=450,
+        max_tokens=1024,
         n=1,
         temperature=0.5,
     )
@@ -23,7 +23,7 @@ def GPT(stra):
     # Print the generated text
 
     str0 = str(response["choices"][0]["text"])
-    if stra.startswith('t'):
+    if mode==0:
         return str0
     else:
         s = re.sub(r"(.{50})", "\\1\r\n", str0)
