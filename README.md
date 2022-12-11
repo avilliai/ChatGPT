@@ -1,6 +1,11 @@
 # ChatGPT-yirimirai
+
 使用yirimirai调用chatgpt
+
 需求：3.10>python>3.7
+
+项目修改自[acheong08]的ChatGPT(https://github.com/acheong08/ChatGPT)
+
 # 使用方法
 
   1.克隆此仓库
