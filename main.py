@@ -100,7 +100,7 @@ if __name__ == '__main__':
                         reply=new
 
                     for i in reply:
-                        i = i.replace('Assistant', 'yucca')
+                        
                         await bot.send(event,i)
                     #reply=reply.replace('Assistant','yucca')
                     #await bot.send(event,reply)
