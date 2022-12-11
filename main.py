@@ -135,4 +135,7 @@ if __name__ == '__main__':
             chatWant = 0
             await bot.send(event, '那我.....先离开啦~')
 
+        if event.message_chain=='clear':
+            await bot.send(event, '已清空聊天数据')
+            userDict[event.sender.id]=[]
     bot.run()
