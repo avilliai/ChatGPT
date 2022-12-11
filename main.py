@@ -89,7 +89,7 @@ if __name__ == '__main__':
                     cona="\n".join(conversation)
                     reply= mains(cona)
                     if len(reply)>6:
-                        step = 6
+                        step = 5
                         str1=''
                         reply = [reply[i:i + step] for i in range(0, len(reply), step)]
                         new=[]
