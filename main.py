@@ -88,6 +88,17 @@ if __name__ == '__main__':
                     conversation.append(str(event.message_chain))
                     cona="\n".join(conversation)
                     reply= mains(cona)
+                    if len(reply)>6:
+                        step = 6
+                        str1=''
+                        reply = [reply[i:i + step] for i in range(0, len(reply), step)]
+                        new=[]
+                        for sa in reply:
+                            for saa in sa:
+                                str1+=(saa+'\n')
+                            new.append(str1)
+                        reply=new
+
                     for i in reply:
                         i = i.replace('Assistant', 'yucca')
                         await bot.send(event,i)

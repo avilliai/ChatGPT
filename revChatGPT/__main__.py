@@ -184,10 +184,11 @@ def mains(s):
                             textwrap.wrap(part, width=80))
                         for _ in formatted_parts:
                             if len(formatted_parts) > lines_printed + 1:
-                                print('format:'+formatted_parts[lines_printed])
+                                #print('format:'+formatted_parts[lines_printed])
                                 lines_printed += 1
 
                 print('p2')
+
                 #formatted_parts="\n".join(formatted_parts)
                 print(formatted_parts[lines_printed])
                 #print(formatted_parts)
