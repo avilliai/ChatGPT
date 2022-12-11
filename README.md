@@ -14,9 +14,9 @@
   
   3.修改main.py中botqq,key,port与你mirai-api-http的保持一致
   
-  4.如打算使用官方api，把你的apikey填入chatGPT.py中
+  4.如希望使用官方api，把你的apikey填入chatGPT.py中
   
-  4.连续聊天请获取token，并将其填入config.json。获取token可以参考[这里](https://lucent.blog/?p=99)
+  4.如希望连续聊天请获取token，并将其填入config.json。获取token可以参考[这里](https://lucent.blog/?p=99)
   
   4.运行main.py
   
