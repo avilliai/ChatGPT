@@ -150,7 +150,7 @@ if __name__ == '__main__':
     @bot.on(GroupMessage)
     async def selectPrompt(event: GroupMessage):
         global userDict
-        if str(event.message_chain)=='sel#1':
+        if str(event.message_chain)=='seed#1':
             if event.sender.id in userDict.keys():
                 a=userDict.get(event.sender.id)
                 await bot.send(event,'已选用seed：猫娘')
