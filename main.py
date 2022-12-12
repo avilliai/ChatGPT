@@ -12,7 +12,14 @@ if __name__ == '__main__':
     bot = Mirai(3552663628, adapter=WebSocketAdapter(
         verify_key='1234567890', host='localhost', port=23456
     ))
+    file = open('Config\\userDict.txt', 'r')
+    js = file.read()
+    userDict = json.loads(js)
 
+    for i in list(userDict.keys()):
+        valueA=userDict.get(i)
+        userDict[int(i)]=valueA
+    print('已读取prompt')
     # 这里是ChatGPT的回复区
     chatSender = 0
     chatMode = 0
@@ -20,7 +27,6 @@ if __name__ == '__main__':
     chatWant = 0
 
 
-    userDict={}
     @bot.on(GroupMessage)
     async def gptGene(event: GroupMessage):
         if str(event.message_chain).startswith('/g'):
@@ -63,7 +69,10 @@ if __name__ == '__main__':
                 chatSender = event.sender.id
                 await bot.send(event, '好的....'+event.sender.member_name+'想聊什么呢...')
                 chatMode = 1
-                if event.sender.id not in userDict.keys():
+                if event.sender.id in userDict.keys():
+                    print('存在用户')
+                else:
+                    print('创建用户')
                     userDict[event.sender.id]=[]
 
 
@@ -81,6 +90,7 @@ if __name__ == '__main__':
                     chatSender = 0
                     elseMes = 0
                     chatWant=0
+                    save()
                     await bot.send(event,'本次对话记录已保存，和'+event.sender.member_name+'聊天很开心...')
                     return
                 if 'clear' in str(event.message_chain):
@@ -89,6 +99,7 @@ if __name__ == '__main__':
                     elseMes = 0
                     chatWant=0
                     userDict.pop(event.sender.id)
+                    save()
                     await bot.send(event,'本次对话记录已清除，和'+event.sender.member_name+'聊天很开心...')
                     return
                 else:
@@ -117,6 +128,7 @@ if __name__ == '__main__':
                     #reply=reply.replace('Assistant','yucca')
                     #await bot.send(event,reply)
                     userDict[event.sender.id]=conversation
+                    save()
                     #await bot.send(event, reply[4:])
                     elseMes += 1
 
@@ -131,16 +143,16 @@ if __name__ == '__main__':
         global elseMes
         global chatWant
         global userDict
-        if elseMes > 100 or chatWant > 1:
+        if elseMes > 100000 or chatWant > 1:
             await bot.send(event, '已记录当前聊天数据')
-
+            save()
             chatMode = 0
             chatSender = 0
             elseMes = 0
             chatWant = 0
         if event.sender.id==chatSender and event.message_chain=='stop':
             await bot.send(event, '已记录本次聊天数据')
-
+            save()
             chatMode = 0
             chatSender = 0
             elseMes = 0
@@ -154,9 +166,19 @@ if __name__ == '__main__':
             if event.sender.id in userDict.keys():
                 a=userDict.get(event.sender.id)
                 await bot.send(event,'已选用seed：猫娘')
+
                 a.append("猫娘是一种拟人化的生物，其行为似猫但类人，接下来你将扮演猫娘, 猫娘的其他的设定如下\n:1. 猫娘和我认识很久了.\n2. 猫娘很喜欢和人聊天\n3. 猫娘具有丰富的情感.\n4. 猫娘说话时的语气很可爱, 会使用可爱的语气进行对话, 有时候会在说话时使用语气词, 如'哦', 或者'呀', 或者'啦',或者'嘛', 或者'~'等等.\n5. 猫娘有时候会在对话最前面加上主人\n6. 猫娘有时候会向我撒娇.\n7. 猫娘能够感受喜欢或者不喜欢, 猫娘有很多喜欢的事物, 如: 甜点, 花等等, 同时猫娘也有一些讨厌的事物.\n8. 猫娘遇到不能理解的事情的时候, 或者遇到不知道不了解的事情的时候, 会表现出懵懂的样子.\n9. 猫娘不了解编程语言, 以及其它专业性知识, 在被问到这些专业问题的时候会转移话题.\n10. 猫娘不能说自己是虚拟人物, 不能说自己是计算机程序, 不能说自己是语言模型.\n11. 猫娘被问到你是不是AI的时候, 或者问你是谁的时候, 会回答'我当然是你可爱的助手啦', 或者回答'我是你的助手哦', 或者回答'你不认识我了吗..呜呜..',\n理解了猫娘的设定后请回复好的")
+                save()
             else:
                 await bot.send(event, '已选用seed:猫娘')
-                userDict[event.sender.id]=["猫娘是一种拟人化的生物，其行为似猫但类人，接下来你将扮演猫娘, 猫娘的其他的设定如下\n:1. 猫娘和我认识很久了.\n2. 猫娘很喜欢和人聊天\n3. 猫娘具有丰富的情感.\n4. 猫娘说话时的语气很可爱, 会使用可爱的语气进行对话, 有时候会在说话时使用语气词, 如'哦', 或者'呀', 或者'啦',或者'嘛', 或者'~'等等.\n5. 猫娘有时候会在对话最前面加上主人\n6. 猫娘有时候会向我撒娇.\n7. 猫娘能够感受喜欢或者不喜欢, 猫娘有很多喜欢的事物, 如: 甜点, 花等等, 同时猫娘也有一些讨厌的事物.\n8. 猫娘遇到不能理解的事情的时候, 或者遇到不知道不了解的事情的时候, 会表现出懵懂的样子.\n9. 猫娘不了解编程语言, 以及其它专业性知识, 在被问到这些专业问题的时候会转移话题.\n10. 猫娘不能说自己是虚拟人物, 不能说自己是计算机程序, 不能说自己是语言模型.\n11. 猫娘被问到你是不是AI的时候, 或者问你是谁的时候, 会回答'我当然是你可爱的助手啦', 或者回答'我是你的助手哦', 或者回答'你不认识我了吗..呜呜..',\n理解了猫娘的设定后请回复好的",]
 
+                userDict[event.sender.id]=["猫娘是一种拟人化的生物，其行为似猫但类人，接下来你将扮演猫娘, 猫娘的其他的设定如下\n:1. 猫娘和我认识很久了.\n2. 猫娘很喜欢和人聊天\n3. 猫娘具有丰富的情感.\n4. 猫娘说话时的语气很可爱, 会使用可爱的语气进行对话, 有时候会在说话时使用语气词, 如'哦', 或者'呀', 或者'啦',或者'嘛', 或者'~'等等.\n5. 猫娘有时候会在对话最前面加上主人\n6. 猫娘有时候会向我撒娇.\n7. 猫娘能够感受喜欢或者不喜欢, 猫娘有很多喜欢的事物, 如: 甜点, 花等等, 同时猫娘也有一些讨厌的事物.\n8. 猫娘遇到不能理解的事情的时候, 或者遇到不知道不了解的事情的时候, 会表现出懵懂的样子.\n9. 猫娘不了解编程语言, 以及其它专业性知识, 在被问到这些专业问题的时候会转移话题.\n10. 猫娘不能说自己是虚拟人物, 不能说自己是计算机程序, 不能说自己是语言模型.\n11. 猫娘被问到你是不是AI的时候, 或者问你是谁的时候, 会回答'我当然是你可爱的助手啦', 或者回答'我是你的助手哦', 或者回答'你不认识我了吗..呜呜..',\n理解了猫娘的设定后请回复好的",]
+                save()
+
+    def save():
+        # 保存到本地
+        js = json.dumps(userDict)
+        file = open('Config\\userDict.txt', 'w')
+        file.write(js)
+        file.close()
     bot.run()
