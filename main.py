@@ -82,6 +82,7 @@ if __name__ == '__main__':
                     elseMes = 0
                     chatWant=0
                     await bot.send(event,'本次对话记录已保存，和'+event.sender.member_name+'聊天很开心...')
+                    return
                 else:
                     conversation=userDict.get(event.sender.id)
                     print('已接收' + str(event.message_chain))
@@ -100,7 +101,7 @@ if __name__ == '__main__':
                         reply=new
 
                     for i in reply:
-                        i = i.replace('Assistant', 'yucca')
+                        i = i.replace('Assistant', '')
                         await bot.send(event,i)
                     #reply=reply.replace('Assistant','yucca')
                     #await bot.send(event,reply)
