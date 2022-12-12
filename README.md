@@ -18,7 +18,8 @@
   
   4.1如希望连续聊天请获取token，并将其填入config.json。获取session_token可以参考[这里](https://lucent.blog/?p=99)
   
-  4.2此外你需要获取cf_clearance，和获取token的方法一样。
+  4.2此外你需要获取cf_clearance，和获取token的方法一样。![image](https://user-images.githubusercontent.com/99066610/206945384-3d42acd2-7bc0-46b5-8d72-01085464ad06.png)
+
     
   4.3最后是user_agent，[参考](https://blog.csdn.net/Inochigohan/article/details/120636769)
   
