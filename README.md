@@ -16,7 +16,11 @@
   
   4.如希望使用官方api，把你的apikey填入chatGPT.py中
   
-  4.如希望连续聊天请获取token，并将其填入config.json。获取token可以参考[这里](https://lucent.blog/?p=99)
+  4.如希望连续聊天请获取token，并将其填入config.json。获取session_token可以参考[这里](https://lucent.blog/?p=99)
+  
+    此外你需要获取cf_clearance，和获取token的方法一样。
+    
+    最后是user_agent，[参考](https://blog.csdn.net/Inochigohan/article/details/120636769)
   
   4.运行main.py
   
