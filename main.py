@@ -9,7 +9,7 @@ from revChatGPT.__main__ import mains
 
 if __name__ == '__main__':
 
-    bot = Mirai(3093724179, adapter=WebSocketAdapter(
+    bot = Mirai(3552663628, adapter=WebSocketAdapter(
         verify_key='1234567890', host='localhost', port=23456
     ))
 
@@ -61,7 +61,7 @@ if __name__ == '__main__':
             else:
                 global chatSender
                 chatSender = event.sender.id
-                await bot.send(event, '好的....'+event.sender.member_name+'想问什么呢...')
+                await bot.send(event, '好的....'+event.sender.member_name+'想聊什么呢...')
                 chatMode = 1
                 if event.sender.id not in userDict.keys():
                     userDict[event.sender.id]=[]
@@ -82,6 +82,14 @@ if __name__ == '__main__':
                     elseMes = 0
                     chatWant=0
                     await bot.send(event,'本次对话记录已保存，和'+event.sender.member_name+'聊天很开心...')
+                    return
+                if 'clear' in str(event.message_chain):
+                    chatMode = 0
+                    chatSender = 0
+                    elseMes = 0
+                    chatWant=0
+                    userDict.pop(event.sender.id)
+                    await bot.send(event,'本次对话记录已清除，和'+event.sender.member_name+'聊天很开心...')
                     return
                 else:
                     conversation=userDict.get(event.sender.id)
