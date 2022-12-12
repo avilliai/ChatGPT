@@ -104,8 +104,14 @@ if __name__ == '__main__':
                 else:
                     conversation=userDict.get(str(event.sender.id))
                     print('已接收' + str(event.message_chain))
+                    if len(str(event.message_chain))>600:
+                        await bot.send(event,'检测到长字符串，自动关闭学习模式')
+                        learnMode=0
                     conversation.append(str(event.message_chain))
                     cona="\n".join(conversation)
+                    if len(cona)>900:
+                        await bot.send(event, '当前语料过长，为保证使用，自动关闭学习模式')
+                        learnMode = 0
                     reply= mains(cona)
                     try:
                         if len(reply)>6:
