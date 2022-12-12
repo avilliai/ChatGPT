@@ -82,6 +82,7 @@ if __name__ == '__main__':
         global elseMes
         global userDict
         global chatWant
+        global learnMode
         if event.sender.id == chatSender:
             if chatMode == 1:
                 if 'stop' in str(event.message_chain):
@@ -97,7 +98,7 @@ if __name__ == '__main__':
                     chatSender = 0
                     elseMes = 0
                     chatWant=0
-                    userDict[str(event.sender.id)]=[]
+                    del userDict[str(event.sender.id)]
                     save()
                     await bot.send(event,'本次对话记录已清除，和'+event.sender.member_name+'聊天很开心...')
                     return
@@ -125,13 +126,14 @@ if __name__ == '__main__':
                                 new.append(str1)
                             reply=new
                     except:
-                        reply=reply
+                        print('error')
                     try:
                         for i in reply:
                             i = i.replace('Assistant', '')
                             await bot.send(event,i)
                     except:
-                        await bot.send(event, reply)
+                        print(type(reply))
+                        await bot.send(event, str(reply))
                     #reply=reply.replace('Assistant','yucca')
                     #await bot.send(event,reply)
                     if learnMode==1:
