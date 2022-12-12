@@ -106,7 +106,7 @@ if __name__ == '__main__':
                     learnMode = 1
                     await bot.send(event, '已开启记录,接下来的对话将被记录用于生成回复')
                     return
-                if str(event.message_chain) == '停止记录':
+                if '停止记录' in str(event.message_chain) :
                     learnMode = 0
                     await bot.send(event, '已关闭，不再记录对话')
                     return
