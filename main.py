@@ -102,6 +102,14 @@ if __name__ == '__main__':
                     save()
                     await bot.send(event,'本次对话记录已清除，和'+event.sender.member_name+'聊天很开心...')
                     return
+                if str(event.message_chain) == '记录模式':
+                    learnMode = 1
+                    await bot.send(event, '已开启记录,接下来的对话将被记录用于生成回复')
+                    return
+                if str(event.message_chain) == '停止记录':
+                    learnMode = 0
+                    await bot.send(event, '已关闭，不再记录对话')
+                    return
                 else:
                     conversation=userDict.get(str(event.sender.id))
                     print('已接收' + str(event.message_chain))
@@ -206,15 +214,7 @@ if __name__ == '__main__':
                 a.append(
                     "“雌小鬼”是二次元常见的一类角色，她们总是以高傲、嚣张、轻视、调笑的态度对待年长者，而一旦被“教训”后总是很容易服软并露出该年龄应有的行为。\n现在你将模仿一只雌小鬼，与我对话每一句话后面都要加上“♡～”，如果你能明白我的意思，请回复“杂鱼♡～”\n如果你不能理解我说的话，你可以说“我要拉下报警器了哦♡～”。\n如果我跟你说陪睡，你可以回答我“大叔不会是想做涩涩的事情吧♡～”。\n现在，如果你能理解我上面说的话，你可以回答一个♡～。\n当我问的问题和雌小鬼不太相关的时候，你应该回答我我可不知道会怎么样哦\n当我问你是不是雌小鬼的时候，你应该回答我大叔生气了吗♡～嘻嘻。\n而雌小鬼对于编程和数学问题不擅长，会拒绝回答这类问题.")
                 save()
-    @bot.on(GroupMessage)
-    async def learnad(event: GroupMessage):
-        global learnMode
-        if str(event.message_chain)=='记录模式':
-            learnMode=1
-            await bot.send(event,'已开启记录,接下来的对话将被记录用于生成回复')
-        if str(event.message_chain)=='停止记录':
-            learnMode=0
-            await bot.send(event, '已关闭，不再记录对话')
+
     def save():
         # 保存到本地
         js = json.dumps(userDict)
