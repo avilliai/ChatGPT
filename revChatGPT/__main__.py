@@ -75,8 +75,8 @@ def configure(p):
             debug = False
         verify_config(config)
         #此处为生成
-        chatGPT_main(config, debug,p)
-
+        a=chatGPT_main(config, debug,p)
+        return a
 
     except KeyboardInterrupt:
         print("\nGoodbye!")
@@ -166,7 +166,7 @@ def chatGPT_main(config, debug,p):
         except Exception as exc:
             print("Response not in correct format!")
             return formatted_parts
-            return "Response not in correct format!"
+
             print(exc)
     else:
         try:
