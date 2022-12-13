@@ -35,7 +35,7 @@ class CaptchaSolver:
         return solution
 
 
-'''def get_input(prompt):
+def get_input(prompt):
     # prompt for input
     lines = []
     print(prompt, end="")
@@ -48,7 +48,7 @@ class CaptchaSolver:
     # Join the lines, separated by newlines, and print the result
     user_input = "\n".join(lines)
     # print(user_input)
-    return user_input'''
+    return user_input
 
 
 def configure(p):
@@ -62,20 +62,22 @@ def configure(p):
             config_files.append(f"{user_home}/.config/revChatGPT/config.json")
 
         config_file = next((f for f in config_files if exists(f)), None)
-        if not config_file:
-            print("Please create and populate ./config.json, $XDG_CONFIG_HOME/revChatGPT/config.json, or ~/.config/revChatGPT/config.json to continue")
-            exit()
-
-        with open(config_file, encoding="utf-8") as f:
-            config = json.load(f)
+        if config_file:
+            with open(config_file, encoding="utf-8") as f:
+                config = json.load(f)
+        else:
+            print("No config file found.")
+            config = {}
         if "--debug" in argv:
             print("Debugging enabled.")
             debug = True
         else:
             debug = False
+        verify_config(config)
+        #此处为生成
+        chatGPT_main(config, debug,p)
 
-        a=chatGPT_main(config, debug,p)
-        return a
+
     except KeyboardInterrupt:
         print("\nGoodbye!")
         exit()
@@ -85,47 +87,60 @@ def configure(p):
         exit()
 
 
+def verify_config(config):
+    """
+    Verifies the config
+
+    :param config: The config
+    :type config: :obj:`dict`
+    """
+    # Check if the config is empty
+    if 'email' in config or 'password' in config:
+        print("Email and passwords are no longer supported")
+
+
 def chatGPT_main(config, debug,p):
     print("Logging in...")
     chatbot = Chatbot(config, debug=debug,
                       captcha_solver=CaptchaSolver())
     prompt = p  # get_input("\nYou:\n")
-    '''if prompt.startswith("!"):
-        if prompt == "!help":
-            print(
-                """
-            !help - Show this message
-            !reset - Forget the current conversation
-            !refresh - Refresh the session authentication
-            !rollback <num> - Rollback the conversation by <num> message(s); <num> is optional, defaults to 1
-            !config - Show the current configuration
-            !exit - Exit the program
-            """,
-            )
-            continue
-        elif prompt == "!reset":
-            chatbot.reset_chat()
-            print("Chat session reset.")
-            continue
-        elif prompt == "!refresh":
-            chatbot.refresh_session()
-            print("Session refreshed.\n")
-            continue
-        # elif prompt == "!rollback":
-        elif prompt.startswith("!rollback"):
-            try:
-                # Get the number of messages to rollback
-                num = int(prompt.split(" ")[1])
-            except IndexError:
-                num = 1
-            chatbot.rollback_conversation(num)
-            print(f"Chat session rolled back {num} message(s).")
-            continue
-        elif prompt == "!config":
-            print(json.dumps(config, indent=4))
-            continue
-        elif prompt == "!exit":
-            break'''
+    '''prompt = p#get_input("\nYou:\n")
+            if prompt.startswith("!"):
+                if prompt == "!help":
+                    print(
+                        """
+                    !help - Show this message
+                    !reset - Forget the current conversation
+                    !refresh - Refresh the session authentication
+                    !rollback <num> - Rollback the conversation by <num> message(s); <num> is optional, defaults to 1
+                    !config - Show the current configuration
+                    !exit - Exit the program
+                    """,
+                    )
+                    continue
+                elif prompt == "!reset":
+                    chatbot.reset_chat()
+                    print("Chat session reset.")
+                    continue
+                elif prompt == "!refresh":
+                    chatbot.refresh_session()
+                    print("Session refreshed.\n")
+                    continue
+                # elif prompt == "!rollback":
+                elif prompt.startswith("!rollback"):
+                    try:
+                        # Get the number of messages to rollback
+                        num = int(prompt.split(" ")[1])
+                    except IndexError:
+                        num = 1
+                    chatbot.rollback_conversation(num)
+                    print(f"Chat session rolled back {num} message(s).")
+                    continue
+                elif prompt == "!config":
+                    print(json.dumps(config, indent=4))
+                    continue
+                elif prompt == "!exit":
+                    break'''
 
     if "--text" not in argv:
         lines_printed = 0
@@ -146,34 +161,24 @@ def chatGPT_main(config, debug,p):
                         if len(formatted_parts) > lines_printed + 1:
                             print(formatted_parts[lines_printed])
                             lines_printed += 1
-            print('path1')
-
             print(formatted_parts[lines_printed])
-            print(type(formatted_parts))
-
-
             return formatted_parts
         except Exception as exc:
             print("Response not in correct format!")
             return formatted_parts
             return "Response not in correct format!"
             print(exc)
-
     else:
-        print('path2')
         try:
             print("Chatbot: ")
             message = chatbot.get_chat_response(prompt)
             print(message["message"])
-            return message["message"]
         except Exception as exc:
             print("Something went wrong!")
             return '我不是很理解呢.....'
             print(exc)
 
-
-
-
+#修改了，用不到
 '''def main():
     if "--help" in argv:
         print(

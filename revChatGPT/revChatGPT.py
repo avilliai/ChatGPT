@@ -5,15 +5,12 @@ import json
 import uuid
 import asyncio
 
-import re
-
 import httpx
 
 from typing import List
 
-from OpenAIAuth.OpenAIAuth import Debugger
-
-import undetected_chromedriver as uc
+from playwright.async_api import async_playwright
+from cf_clearance2 import async_cf_retry, async_stealth
 
 
 def generate_uuid() -> str:
@@ -25,6 +22,20 @@ def generate_uuid() -> str:
     """
     uid = str(uuid.uuid4())
     return uid
+
+
+class Debugger:
+    def __init__(self, debug: bool = False):
+        if debug:
+            print("Debugger enabled on OpenAIAuth")
+        self.debug = debug
+
+    def set_debug(self, debug: bool):
+        self.debug = debug
+
+    def log(self, message: str, end: str = "\n"):
+        if self.debug:
+            print(message, end=end)
 
 
 class AsyncChatbot:
@@ -69,7 +80,7 @@ class AsyncChatbot:
     request_timeout: int
     captcha_solver: any
 
-    def __init__(self, config, conversation_id=None, parent_id=None, debug=False, refresh=True, request_timeout=100,
+    def __init__(self, config, conversation_id=None, parent_id=None, debug=False, request_timeout=100,
                  captcha_solver=None, base_url="https://chat.openai.com/", max_rollbacks=20):
         self.debugger = Debugger(debug)
         self.debug = debug
@@ -96,10 +107,7 @@ class AsyncChatbot:
             "Accept-Language": self.config["accept_language"]+";q=0.9",
             "Referer": "https://chat.openai.com/chat",
         }
-        if ("session_token" in config) and refresh:
-            self.refresh_session()
-        if "Authorization" in config:
-            self.__refresh_headers()
+        self.refresh_session()
 
     def reset_chat(self) -> None:
         """
@@ -202,14 +210,6 @@ class AsyncChatbot:
                 response = response[6:]
             except Exception as exc:
                 self.debugger.log("Incorrect response from OpenAI API")
-                try:
-                    resp = response.json()
-                    self.debugger.log(resp)
-                    if resp['detail']['code'] == "invalid_api_key" or resp['detail']['code'] == "token_expired":
-                        self.refresh_session()
-                except Exception as exc2:
-                    self.debugger.log(response.text)
-                    raise Exception("Not a JSON response") from exc2
                 raise Exception("Incorrect response from OpenAI API") from exc
             response = json.loads(response)
             self.parent_id = response["message"]["id"]
@@ -234,6 +234,7 @@ class AsyncChatbot:
         :return: The chat response `{"message": "Returned messages", "conversation_id": "conversation ID", "parent_id": "parent ID"}` or None
         :rtype: :obj:`dict` or :obj:`None`
         """
+        self.refresh_session()
         data = {
             "action": "next",
             "messages": [
@@ -278,7 +279,9 @@ class AsyncChatbot:
         :return: None
         """
         # Either session_token, email and password or Authorization is required
-        if self.config.get("session_token"):
+        if not self.config.get("cf_clearance") or not self.config.get("session_token"):
+            asyncio.run(self.get_cf_cookies())
+        if self.config.get("session_token") and self.config.get("cf_clearance"):
             s = httpx.Client()
             if self.config.get("proxy"):
                 s.proxies = {
@@ -290,13 +293,11 @@ class AsyncChatbot:
                 "__Secure-next-auth.session-token",
                 self.config["session_token"],
             )
-            # Set cloudflare cookies
-            if "cf_clearance" in self.config:
-                s.cookies.set(
-                    "cf_clearance",
-                    self.config["cf_clearance"],
-                )
-            self.debugger.log(s.cookies.get("cf_clearance"))
+
+            s.cookies.set(
+                "cf_clearance",
+                self.config["cf_clearance"],
+            )
             # s.cookies.set("__Secure-next-auth.csrf-token", self.config['csrf_token'])
             response = s.get(
                 self.base_url + "api/auth/session",
@@ -307,7 +308,7 @@ class AsyncChatbot:
             # Check the response code
             if response.status_code != 200:
                 if response.status_code == 403:
-                    self.get_cf_cookies()
+                    asyncio.run(self.get_cf_cookies())
                     self.refresh_session()
                     return
                 else:
@@ -326,7 +327,7 @@ class AsyncChatbot:
                 self.config["Authorization"] = response.json()["accessToken"]
                 self.__refresh_headers()
             # If it fails, try to login with email and password to get tokens
-            except Exception:
+            except Exception as exc:
                 # Check if response JSON is empty
                 if response.json() == {}:
                     self.debugger.log("Empty response")
@@ -339,68 +340,49 @@ class AsyncChatbot:
                         # Check if code is token_expired
                         if response.json()['detail']['code'] == 'token_expired':
                             self.debugger.log("Token expired")
-                raise Exception("Failed to refresh session")
+                raise Exception("Failed to refresh session") from exc
+            return
         else:
             self.debugger.log(
                 "No session_token, email and password or Authorization provided")
             raise ValueError(
                 "No session_token, email and password or Authorization provided")
 
-    def get_cf_cookies(self) -> None:
+    async def get_cf_cookies(self) -> None:
         """
         Get cloudflare cookies.
 
         :return: None
         """
-        self.cookie_found = False
-        self.agent_found = False
-
-        def detect_cookies(message):
-            if 'params' in message:
-                if 'headers' in message['params']:
-                    if 'set-cookie' in message['params']['headers']:
-                        # Use regex to get the cookie for cf_clearance=*;
-                        cookie = re.search(
-                            "cf_clearance=.*?;", message['params']['headers']['set-cookie'])
-                        if cookie:
-                            self.debugger.log(
-                                "Found cookie: " + cookie.group(0))
-                            # remove the semicolon and 'cf_clearance=' from the string
-                            raw_cookie = cookie.group(0)
-                            self.config['cf_clearance'] = raw_cookie[13:-1]
-                            self.cookie_found = True
-
-        def detect_user_agent(message):
-            if 'params' in message:
-                if 'headers' in message['params']:
-                    if 'user-agent' in message['params']['headers']:
-                        # Use regex to get the cookie for cf_clearance=*;
-                        user_agent = message['params']['headers']['user-agent']
-                        self.config['user_agent'] = user_agent
-                        self.agent_found = True
-                        self.debugger.log("Found user agent: " + user_agent)
-        options = uc.ChromeOptions()
-        options.add_argument("--disable-extensions")
-        options.add_argument('--disable-application-cache')
-        options.add_argument('--disable-gpu')
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-setuid-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        if self.config.get("proxy", "") != "":
-            options.add_argument("--proxy-server=" + self.config["proxy"])
-        driver = uc.Chrome(enable_cdp_events=True, options=options)
-        driver.add_cdp_listener(
-            "Network.responseReceivedExtraInfo", lambda msg: detect_cookies(msg))
-        driver.add_cdp_listener(
-            "Network.requestWillBeSentExtraInfo", lambda msg: detect_user_agent(msg))
-        driver.get("https://chat.openai.com/chat")
-        from time import sleep
-        while not self.agent_found or not self.cookie_found:
-            print("Waiting for cookies...")
-            sleep(5)
-        driver.close()
-        driver.quit()
-        del driver
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=False)
+            page = await browser.new_page()
+            if 'session_token' in self.config:
+                await async_stealth(page, pure=False)
+            else:
+                await async_stealth(page, pure=False)
+            await page.goto('https://chat.openai.com/')
+            page_wait_for_url = 'https://chat.openai.com/chat' if not self.config.get(
+                'session_token') else None
+            res = await async_cf_retry(
+                page, wait_for_url=page_wait_for_url)
+            if res:
+                cookies = await page.context.cookies()
+                for cookie in cookies:
+                    if cookie.get('name') == 'cf_clearance':
+                        cf_clearance_value = cookie.get('value')
+                        self.debugger.log(cf_clearance_value)
+                    elif cookie.get('name') == '__Secure-next-auth.session-token':
+                        self.config['session_token'] = cookie.get('value')
+                ua = await page.evaluate('() => {return navigator.userAgent}')
+                self.debugger.log(ua)
+            else:
+                self.debugger.log("cf challenge fail")
+                raise Exception("cf challenge fail")
+            await browser.close()
+            del browser
+            self.config['cf_clearance'] = cf_clearance_value
+            self.config['user_agent'] = ua
 
     def send_feedback(
         self,
@@ -412,7 +394,7 @@ class AsyncChatbot:
     ):
         from dataclasses import dataclass
 
-        @dataclass
+        @ dataclass
         class ChatGPTTags:
             Harmful = "harmful"
             NotTrue = "false"
@@ -447,9 +429,6 @@ class AsyncChatbot:
         )
 
         return response
-
-    def refresh_cookies(self):
-        pass
 
 
 class Chatbot(AsyncChatbot):
@@ -544,6 +523,7 @@ class Chatbot(AsyncChatbot):
         :return: The chat response `{"message": "Returned messages", "conversation_id": "conversation ID", "parent_id": "parent ID"}` or None
         :rtype: :obj:`dict` or :obj:`None`
         """
+        self.refresh_session()
         if output == "text":
             coroutine_object = super().get_chat_response(
                 prompt, output, conversation_id, parent_id)
