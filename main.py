@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import json
 
-from mirai import Mirai, FriendMessage, WebSocketAdapter,GroupMessage,Image
-import openai
+from mirai import Mirai, WebSocketAdapter,GroupMessage,Image
 
 from chatGPT import GPT
-from revChatGPT.__main__ import mains
+
+from revChatGPT.__main__ import configure
 
 if __name__ == '__main__':
 
@@ -121,27 +121,24 @@ if __name__ == '__main__':
                     if len(cona)>900:
                         await bot.send(event, '当前语料过长，为保证使用，自动关闭记录模式')
                         learnMode = 0
-                    reply= mains(cona)
-                    try:
-                        if len(reply)>6:
-                            step = 5
-                            str1=''
-                            reply = [reply[i:i + step] for i in range(0, len(reply), step)]
-                            new=[]
+                    reply= configure(cona)
+                    if type(reply)==list:
+                        if len(reply)>2:
+                            print('大于2')
+                            b=[]
+                            for issa in range(0, len(reply), 3):
+                                strw = ''
+                                for s in reply[issa:issa + 3]:
+                                    strw+=s
+                                b.append(strw)
+                            for stew in b:
+                                await bot.send(event,stew)
+                        else:
+                            print('小于2')
                             for sa in reply:
-                                for saa in sa:
-                                    str1+=(saa+'\n')
-                                new.append(str1)
-                            reply=new
-                    except:
-                        print('error')
-                    try:
-                        for i in reply:
-                            i = i.replace('Assistant', '')
-                            await bot.send(event,i)
-                    except:
-                        print(type(reply))
-                        await bot.send(event, str(reply))
+                                await bot.send(event,sa)
+                    else:
+                        await bot.send(event,reply)
                     #reply=reply.replace('Assistant','yucca')
                     #await bot.send(event,reply)
                     if learnMode==1:

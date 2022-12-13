@@ -4,3 +4,4 @@ svglib~=1.4.1
 requests~=2.28.1
 httpx~=0.23.1
 OpenAIAuth~=0.0.6
+undetected_chromedriver
