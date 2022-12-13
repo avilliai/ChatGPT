@@ -175,7 +175,7 @@ def chatGPT_main(config, debug,p):
             print(message["message"])
         except Exception as exc:
             print("Something went wrong!")
-            return '我不是很理解呢.....'
+            return '我不是很理解呢......'
             print(exc)
 
 #修改了，用不到
