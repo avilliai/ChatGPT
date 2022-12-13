@@ -123,8 +123,8 @@ if __name__ == '__main__':
                         learnMode = 0
                     reply= configure(cona)
                     if type(reply)==list:
+                        # 对返回的列表进行处理
                         if len(reply)>2:
-                            print('大于2')
                             b=[]
                             for issa in range(0, len(reply), 3):
                                 strw = ''
@@ -134,10 +134,10 @@ if __name__ == '__main__':
                             for stew in b:
                                 await bot.send(event,stew)
                         else:
-                            print('小于2')
                             for sa in reply:
                                 await bot.send(event,sa)
                     else:
+                        #一般用来输出报错
                         await bot.send(event,reply)
                     #reply=reply.replace('Assistant','yucca')
                     #await bot.send(event,reply)
