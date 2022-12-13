@@ -12,7 +12,7 @@
 
   1.克隆此仓库
   
-  2.运行pip install -r requirements.txt
+  2.打开cmd运行pip install -r requirements.txt
   
   3.修改main.py中botqq,key,port与你mirai-api-http的保持一致
   
@@ -24,6 +24,8 @@
 
     
   4.3最后是user_agent，[参考](https://blog.csdn.net/Inochigohan/article/details/120636769)
+  
+  4.4.打开cmd运行pip install cf_clearance2-0.28.3.tar.gz
   
   5.运行main.py
   
