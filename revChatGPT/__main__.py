@@ -74,7 +74,7 @@ def configure(p):
         else:
             debug = False
         verify_config(config)
-        #此处为生成
+        #此处为生成a
         a=chatGPT_main(config, debug,p)
         return a
 
