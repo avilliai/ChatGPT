@@ -7,6 +7,8 @@ import asyncio
 
 import httpx
 
+import nest_asyncio
+
 from typing import List
 
 from playwright.async_api import async_playwright
@@ -23,6 +25,8 @@ def generate_uuid() -> str:
     uid = str(uuid.uuid4())
     return uid
 
+async def b__async_func_for_check():
+    pass
 
 class Debugger:
     def __init__(self, debug: bool = False):
@@ -211,15 +215,19 @@ class AsyncChatbot:
             except Exception as exc:
                 self.debugger.log("Incorrect response from OpenAI API")
                 raise Exception("Incorrect response from OpenAI API") from exc
-            response = json.loads(response)
-            self.parent_id = response["message"]["id"]
-            self.conversation_id = response["conversation_id"]
-            message = response["message"]["content"]["parts"][0]
-            return {
-                "message": message,
-                "conversation_id": self.conversation_id,
-                "parent_id": self.parent_id,
-            }
+            # Check if it is JSON
+            if response.startswith("{"):
+                response = json.loads(response)
+                self.parent_id = response["message"]["id"]
+                self.conversation_id = response["conversation_id"]
+                message = response["message"]["content"]["parts"][0]
+                return {
+                    "message": message,
+                    "conversation_id": self.conversation_id,
+                    "parent_id": self.parent_id,
+                }
+            else:
+                return None
 
     async def get_chat_response(self, prompt: str, output="text", conversation_id=None, parent_id=None) -> dict or None:
         """
@@ -234,7 +242,7 @@ class AsyncChatbot:
         :return: The chat response `{"message": "Returned messages", "conversation_id": "conversation ID", "parent_id": "parent ID"}` or None
         :rtype: :obj:`dict` or :obj:`None`
         """
-        self.refresh_session()
+        self.refresh_session(running_in_async=True)
         data = {
             "action": "next",
             "messages": [
@@ -272,12 +280,14 @@ class AsyncChatbot:
             self.conversation_id = self.conversation_id_prev_queue.pop()
             self.parent_id = self.parent_id_prev_queue.pop()
 
-    def refresh_session(self) -> None:
+    def refresh_session(self, running_in_async = False) -> None:
         """
         Refresh the session.
 
         :return: None
         """
+        if running_in_async:
+            nest_asyncio.apply()
         # Either session_token, email and password or Authorization is required
         if not self.config.get("cf_clearance") or not self.config.get("session_token"):
             asyncio.run(self.get_cf_cookies())
@@ -309,7 +319,7 @@ class AsyncChatbot:
             if response.status_code != 200:
                 if response.status_code == 403:
                     asyncio.run(self.get_cf_cookies())
-                    self.refresh_session()
+                    self.refresh_session(running_in_async=running_in_async)
                     return
                 else:
                     self.debugger.log(
@@ -523,16 +533,16 @@ class Chatbot(AsyncChatbot):
         :return: The chat response `{"message": "Returned messages", "conversation_id": "conversation ID", "parent_id": "parent ID"}` or None
         :rtype: :obj:`dict` or :obj:`None`
         """
+        try:
+            asyncio.run(b__async_func_for_check()) #Check if running in nest use of asyncio.run()
+        except RuntimeError:
+            self.debugger.log("detect nest use of asyncio")
+            nest_asyncio.apply()
         self.refresh_session()
         if output == "text":
             coroutine_object = super().get_chat_response(
                 prompt, output, conversation_id, parent_id)
-            try:
-                return asyncio.run(coroutine_object)
-            except RuntimeError:
-                import nest_asyncio
-                nest_asyncio.apply()
-                return asyncio.run(coroutine_object)
+            return asyncio.run(coroutine_object)
 
         if output == "stream":
             data = {

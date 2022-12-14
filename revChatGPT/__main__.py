@@ -3,7 +3,6 @@ import textwrap
 from os.path import exists
 from os import getenv
 from sys import argv, exit
-import re
 
 from revChatGPT.revChatGPT import Chatbot
 
@@ -74,10 +73,8 @@ def configure(p):
         else:
             debug = False
         verify_config(config)
-        #此处为生成a
         a=chatGPT_main(config, debug,p)
         return a
-
     except KeyboardInterrupt:
         print("\nGoodbye!")
         exit()
@@ -99,86 +96,86 @@ def verify_config(config):
         print("Email and passwords are no longer supported")
 
 
-def chatGPT_main(config, debug,p):
+def chatGPT_main(config, debug,pa):
     print("Logging in...")
     chatbot = Chatbot(config, debug=debug,
                       captcha_solver=CaptchaSolver())
-    prompt = p  # get_input("\nYou:\n")
-    '''prompt = p#get_input("\nYou:\n")
-            if prompt.startswith("!"):
-                if prompt == "!help":
-                    print(
-                        """
-                    !help - Show this message
-                    !reset - Forget the current conversation
-                    !refresh - Refresh the session authentication
-                    !rollback <num> - Rollback the conversation by <num> message(s); <num> is optional, defaults to 1
-                    !config - Show the current configuration
-                    !exit - Exit the program
-                    """,
-                    )
-                    continue
-                elif prompt == "!reset":
-                    chatbot.reset_chat()
-                    print("Chat session reset.")
-                    continue
-                elif prompt == "!refresh":
-                    chatbot.refresh_session()
-                    print("Session refreshed.\n")
-                    continue
-                # elif prompt == "!rollback":
-                elif prompt.startswith("!rollback"):
-                    try:
-                        # Get the number of messages to rollback
-                        num = int(prompt.split(" ")[1])
-                    except IndexError:
-                        num = 1
-                    chatbot.rollback_conversation(num)
-                    print(f"Chat session rolled back {num} message(s).")
-                    continue
-                elif prompt == "!config":
-                    print(json.dumps(config, indent=4))
-                    continue
-                elif prompt == "!exit":
-                    break'''
+    if True:
+        prompt = pa#get_input("\nYou:\n")
+        '''if prompt.startswith("!"):
+            if prompt == "!help":
+                print(
+                    """
+                !help - Show this message
+                !reset - Forget the current conversation
+                !refresh - Refresh the session authentication
+                !rollback <num> - Rollback the conversation by <num> message(s); <num> is optional, defaults to 1
+                !config - Show the current configuration
+                !exit - Exit the program
+                """,
+                )
+                continue
+            elif prompt == "!reset":
+                chatbot.reset_chat()
+                print("Chat session reset.")
+                continue
+            elif prompt == "!refresh":
+                chatbot.refresh_session()
+                print("Session refreshed.\n")
+                continue
+            # elif prompt == "!rollback":
+            elif prompt.startswith("!rollback"):
+                try:
+                    # Get the number of messages to rollback
+                    num = int(prompt.split(" ")[1])
+                except IndexError:
+                    num = 1
+                chatbot.rollback_conversation(num)
+                print(f"Chat session rolled back {num} message(s).")
+                continue
+            elif prompt == "!config":
+                print(json.dumps(config, indent=4))
+                continue
+            elif prompt == "!exit":
+                break'''
 
-    if "--text" not in argv:
-        lines_printed = 0
+        if "--text" not in argv:
+            lines_printed = 0
 
-        try:
-            print("Chatbot: ")
-            formatted_parts = []
-            for message in chatbot.get_chat_response(prompt, output="stream"):
-                # Split the message by newlines
-                message_parts = message["message"].split("\n")
-
-                # Wrap each part separately
+            try:
+                print("Chatbot: ")
                 formatted_parts = []
-                for part in message_parts:
-                    formatted_parts.extend(
-                        textwrap.wrap(part, width=80))
-                    for _ in formatted_parts:
-                        if len(formatted_parts) > lines_printed + 1:
-                            print(formatted_parts[lines_printed])
-                            lines_printed += 1
-            print(formatted_parts[lines_printed])
-            return formatted_parts
-        except Exception as exc:
-            print("Response not in correct format!")
-            return formatted_parts
+                for message in chatbot.get_chat_response(prompt, output="stream"):
+                    # Split the message by newlines
+                    message_parts = message["message"].split("\n")
 
-            print(exc)
-    else:
-        try:
-            print("Chatbot: ")
-            message = chatbot.get_chat_response(prompt)
-            print(message["message"])
-        except Exception as exc:
-            print("Something went wrong!")
-            return '我不是很理解呢......'
-            print(exc)
+                    # Wrap each part separately
+                    formatted_parts = []
+                    for part in message_parts:
+                        formatted_parts.extend(
+                            textwrap.wrap(part, width=80))
+                        for _ in formatted_parts:
+                            if len(formatted_parts) > lines_printed + 1:
+                                print(formatted_parts[lines_printed])
+                                lines_printed += 1
+                print(formatted_parts[lines_printed])
+                return formatted_parts
+            except Exception as exc:
+                print("Response not in correct format!")
+                print(exc)
+                return formatted_parts
+        else:
+            try:
+                print("Chatbot: ")
+                message = chatbot.get_chat_response(prompt)
+                print(message["message"])
+                return message["message"]
+            except Exception as exc:
+                print("Something went wrong!")
+                print(exc)
+                return '出错了呢'
 
-#修改了，用不到
+
 '''def main():
     if "--help" in argv:
         print(
@@ -202,4 +199,5 @@ def chatGPT_main(config, debug,p):
 
 
 if __name__ == "__main__":
-    configure('你好\n我是一只猫娘\n今天天气真好')
+    #main()
+    configure('你好\n我是一只猫娘')

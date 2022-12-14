@@ -4,7 +4,6 @@ import json
 from mirai import Mirai, WebSocketAdapter,GroupMessage,Image
 
 from chatGPT import GPT
-
 from revChatGPT.__main__ import configure
 
 if __name__ == '__main__':
