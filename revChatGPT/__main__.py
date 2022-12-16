@@ -3,6 +3,7 @@ import textwrap
 from os.path import exists
 from os import getenv
 from sys import argv, exit
+import re
 
 from revChatGPT.revChatGPT import Chatbot
 
@@ -50,7 +51,7 @@ def get_input(prompt):
     return user_input
 
 
-def configure(p):
+def configure(sf):
     try:
         config_files = ["config.json"]
         xdg_config_home = getenv("XDG_CONFIG_HOME")
@@ -73,8 +74,8 @@ def configure(p):
         else:
             debug = False
         verify_config(config)
-        a=chatGPT_main(config, debug,p)
-        return a
+        s=chatGPT_main(config, debug,sf)
+        return s
     except KeyboardInterrupt:
         print("\nGoodbye!")
         exit()
@@ -96,48 +97,12 @@ def verify_config(config):
         print("Email and passwords are no longer supported")
 
 
-def chatGPT_main(config, debug,pa):
+def chatGPT_main(config, debug,p):
     print("Logging in...")
     chatbot = Chatbot(config, debug=debug,
                       captcha_solver=CaptchaSolver())
     if True:
-        prompt = pa#get_input("\nYou:\n")
-        '''if prompt.startswith("!"):
-            if prompt == "!help":
-                print(
-                    """
-                !help - Show this message
-                !reset - Forget the current conversation
-                !refresh - Refresh the session authentication
-                !rollback <num> - Rollback the conversation by <num> message(s); <num> is optional, defaults to 1
-                !config - Show the current configuration
-                !exit - Exit the program
-                """,
-                )
-                continue
-            elif prompt == "!reset":
-                chatbot.reset_chat()
-                print("Chat session reset.")
-                continue
-            elif prompt == "!refresh":
-                chatbot.refresh_session()
-                print("Session refreshed.\n")
-                continue
-            # elif prompt == "!rollback":
-            elif prompt.startswith("!rollback"):
-                try:
-                    # Get the number of messages to rollback
-                    num = int(prompt.split(" ")[1])
-                except IndexError:
-                    num = 1
-                chatbot.rollback_conversation(num)
-                print(f"Chat session rolled back {num} message(s).")
-                continue
-            elif prompt == "!config":
-                print(json.dumps(config, indent=4))
-                continue
-            elif prompt == "!exit":
-                break'''
+        prompt = p#get_input("\nYou:\n")
 
         if "--text" not in argv:
             lines_printed = 0
@@ -163,41 +128,20 @@ def chatGPT_main(config, debug,pa):
             except Exception as exc:
                 print("Response not in correct format!")
                 print(exc)
-                return formatted_parts
+
         else:
             try:
                 print("Chatbot: ")
                 message = chatbot.get_chat_response(prompt)
                 print(message["message"])
-                return message["message"]
             except Exception as exc:
                 print("Something went wrong!")
                 print(exc)
-                return '出错了呢'
+                return 'wrong'
 
 
-'''def main():
-    if "--help" in argv:
-        print(
-            """
-        ChatGPT - A command-line interface to OpenAI's ChatGPT (https://chat.openai.com/chat)
-        Repo: github.com/acheong08/ChatGPT
-        Run with --debug to enable debugging
-        """,
-        )
-        exit()
-    print(
-        """
-        ChatGPT - A command-line interface to OpenAI's ChatGPT (https://chat.openai.com/chat)
-        Repo: github.com/acheong08/ChatGPT
-        Run with --debug to enable debugging
-        """,
-    )
-    print("Type '!help' to show commands")
-    print("Press enter twice to submit your question.\n")
-    configure()'''
+
 
 
 if __name__ == "__main__":
-    #main()
-    configure('你好\n我是一只猫娘')
+    configure('你好/我是一只猫娘')

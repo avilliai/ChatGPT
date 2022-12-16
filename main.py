@@ -116,10 +116,15 @@ if __name__ == '__main__':
                         await bot.send(event,'检测到长字符串，自动关闭记录模式')
                         learnMode=0
                     conversation.append(str(event.message_chain))
+
+
+
                     cona="\n".join(conversation)
-                    if len(cona)>900:
+                    if len(cona)>800:
                         await bot.send(event, '当前prompt过长，为保证使用，自动关闭记录模式。发送 clear 以清除现有prompt')
                         learnMode = 0
+                    else:
+                        cona=cona+str(event.message_chain)
                     reply= configure(cona)
                     if type(reply)==list:
                         # 对返回的列表进行处理
