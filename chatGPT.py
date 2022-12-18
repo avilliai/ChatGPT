@@ -7,7 +7,7 @@ from PIL import ImageFont
 from PIL import Image
 from PIL import ImageDraw
 # Set the API key for the openai module
-openai.api_key = "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"
+openai.api_key = "your-key"
 def GPT(stra,mode=1):
     # Use the GPT-3 model to generate text
     print('yourSTR:'+stra)
