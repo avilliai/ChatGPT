@@ -65,6 +65,8 @@ if __name__ == '__main__':
         if str(event.message_chain).startswith('开始聊天') or str(event.message_chain)=='chat':
             if str(event.message_chain)=='chat':
                 chatApi=1
+            else:
+                chatApi=0
             if chatMode != 0:
                 chatWant += 1
                 await bot.send(event, '稍等哦，我正在为别人解决问题....')
@@ -135,7 +137,7 @@ if __name__ == '__main__':
                         cona=cona+str(event.message_chain)
                     if chatApi==1:
                         reply=GPT(cona,0)
-                        chatApi=0
+
                     else:
                         reply= configure(cona)
                     if type(reply)==list:
