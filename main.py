@@ -8,7 +8,7 @@ from revChatGPT.__main__ import configure
 
 if __name__ == '__main__':
 
-    bot = Mirai(3377428814, adapter=WebSocketAdapter(
+    bot = Mirai(3552663628, adapter=WebSocketAdapter(
         verify_key='1234567890', host='localhost', port=23456
     ))
     file = open('Config\\userDict.txt', 'r')
@@ -178,13 +178,15 @@ if __name__ == '__main__':
         global elseMes
         global chatWant
         global userDict
-        if elseMes > 1000000 or chatWant > 1:
+        global chatApi
+        if elseMes > 1000000 or chatWant > 2:
             await bot.send(event, '已记录当前聊天数据')
             save()
             chatMode = 0
             chatSender = 0
             elseMes = 0
             chatWant = 0
+            chatApi=0
         if event.sender.id==chatSender and event.message_chain=='stop':
             await bot.send(event, '已记录本次聊天数据')
             save()
