@@ -8,7 +8,7 @@ from revChatGPT.__main__ import configure
 
 if __name__ == '__main__':
 
-    bot = Mirai(3552663628, adapter=WebSocketAdapter(
+    bot = Mirai(3377428814, adapter=WebSocketAdapter(
         verify_key='1234567890', host='localhost', port=23456
     ))
     file = open('Config\\userDict.txt', 'r')
@@ -24,12 +24,15 @@ if __name__ == '__main__':
     chatWant = 0
     learnMode=1
 
+    chatApi=0
+
 
     @bot.on(GroupMessage)
     async def gptGene(event: GroupMessage):
         if str(event.message_chain).startswith('/g'):
             if str(event.message_chain).startswith('/gt'):
                 a = str(event.message_chain)[3:]
+
                 print('即将发送' + a)
                 backst = GPT(a,0)
                 print('已返回')
@@ -48,6 +51,7 @@ if __name__ == '__main__':
                 await bot.send(event,Image(path=backst))
 
 
+
     def cut(obj, sec):
         return [obj[i:i + sec] for i in range(0, len(obj), sec)]
 
@@ -57,7 +61,10 @@ if __name__ == '__main__':
         global chatMode
         global chatWant
         global userDict
-        if str(event.message_chain).startswith('开始聊天'):
+        global chatApi
+        if str(event.message_chain).startswith('开始聊天') or str(event.message_chain)=='chat':
+            if str(event.message_chain)=='chat':
+                chatApi=1
             if chatMode != 0:
                 chatWant += 1
                 await bot.send(event, '稍等哦，我正在为别人解决问题....')
@@ -82,6 +89,7 @@ if __name__ == '__main__':
         global userDict
         global chatWant
         global learnMode
+        global chatApi
         if event.sender.id == chatSender:
             if chatMode == 1:
                 if 'stop' in str(event.message_chain):
@@ -125,7 +133,11 @@ if __name__ == '__main__':
                         learnMode = 0
                     else:
                         cona=cona+str(event.message_chain)
-                    reply= configure(cona)
+                    if chatApi==1:
+                        reply=GPT(cona,0)
+                        chatApi=0
+                    else:
+                        reply= configure(cona)
                     if type(reply)==list:
                         # 对返回的列表进行处理
                         if len(reply)>2:
