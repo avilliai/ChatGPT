@@ -156,7 +156,7 @@ if __name__ == '__main__':
                                 await bot.send(event,sa)
                     else:
                         #一般用来输出报错
-                        await bot.send(event,str(reply))
+                        await bot.send(event,reply)
                     #reply=reply.replace('Assistant','yucca')
                     #await bot.send(event,reply)
                     if learnMode==1:
