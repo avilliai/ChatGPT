@@ -3,12 +3,12 @@ import json
 
 from mirai import Mirai, WebSocketAdapter,GroupMessage,Image
 
-from chatGPT import GPT
+from chatGPT import GPT, chatBack
 from revChatGPT.__main__ import configure
 
 if __name__ == '__main__':
 
-    bot = Mirai(3552663628, adapter=WebSocketAdapter(
+    bot = Mirai(3377428814, adapter=WebSocketAdapter(
         verify_key='1234567890', host='localhost', port=23456
     ))
     file = open('Config\\userDict.txt', 'r')
@@ -133,10 +133,10 @@ if __name__ == '__main__':
                     if len(cona)>800:
                         await bot.send(event, '当前prompt过长，为保证使用，自动关闭记录模式。发送 clear 以清除现有prompt')
                         learnMode = 0
-                    else:
-                        cona=cona+str(event.message_chain)
+                    '''else:
+                        cona=cona+str(event.message_chain)'''
                     if chatApi==1:
-                        reply=GPT(cona,0)
+                        reply=chatBack(cona)
 
                     else:
                         reply= configure(cona)

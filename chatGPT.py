@@ -7,7 +7,8 @@ from PIL import ImageFont
 from PIL import Image
 from PIL import ImageDraw
 # Set the API key for the openai module
-openai.api_key = "your-key"
+openai.api_key = "sk-xgW2gvXpecEOLMafdaf65xxt6T3BlbkFJj6foExWiIFyV75CXfpSs"
+
 def GPT(stra,mode=1):
     # Use the GPT-3 model to generate text
     print('yourSTR:'+stra)
@@ -46,7 +47,19 @@ def GPT(stra,mode=1):
 
         return 'pictures\\reply.png'
 
-
+def chatBack(str):
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=str,
+        temperature=0.9,
+        max_tokens=150,
+        top_p=1,
+        frequency_penalty=0.0,
+        presence_penalty=0.6,
+        stop=[" Human:", " AI:"]
+    )
+    print(str(response["choices"][0]["text"]))
+    return str(response["choices"][0]["text"])
 
 if __name__ == '__main__':
     GPT('hello')
