@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import re
 
 import openai
@@ -7,7 +8,7 @@ from PIL import ImageFont
 from PIL import Image
 from PIL import ImageDraw
 # Set the API key for the openai module
-openai.api_key = "sk-xgW2gvXpecEOLMafdaf65xxt6T3BlbkFJj6foExWiIFyV75CXfpSs"
+openai.api_key = "sk-xgW2gvXpecEOLM65xxt6adfadfT3BlbkFJj6foExWiIFyV75CXfpSs"
 
 def GPT(stra,mode=1):
     # Use the GPT-3 model to generate text
@@ -51,15 +52,22 @@ def chatBack(str):
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=str,
-        temperature=0.9,
-        max_tokens=150,
+        temperature=0.6,
+        max_tokens=400,
         top_p=1,
         frequency_penalty=0.0,
         presence_penalty=0.6,
         stop=[" Human:", " AI:"]
     )
-    print(str(response["choices"][0]["text"]))
-    return str(response["choices"][0]["text"])
+    print(type(response))
+    #print((response.get("choice")))
+    print(response)
+    #print('------------------------')
+    print((response["choices"][0]["text"]))
+
+    return response["choices"][0]["text"]
+    #print((dica.get("choice"))[0].get("text"))
+    #return str(response["choices"][0])
 
 if __name__ == '__main__':
-    GPT('hello')
+    chatBack('hello,请为我总结Alan Watts的哲学观点')
