@@ -41,7 +41,7 @@
 
   **开始聊天/chat**
   
-  *此命令用于开始会话,使用revChatGPT是 开始聊天 官方api则是chat*
+  *此命令用于开始会话,使用revChatGPT是 开始聊天 官方api则是 chat*
   
   **stop**
   
