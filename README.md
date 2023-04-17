@@ -1,12 +1,12 @@
 # ChatGPT-yirimirai
 
-使用yirimirai调用chatgpt
+使用yirimirai+revChatGpt调用chatgpt
 
 需求：3.10>python>3.7
 
 需要先安装[mirai-api-http](https://github.com/project-mirai/mirai-api-http)
 
-项目修改自[acheong08的ChatGPT](https://github.com/acheong08/ChatGPT)
+项目修改自[acheong08的revChatGPT](https://github.com/acheong08/ChatGPT)
 
 # 使用方法
 
